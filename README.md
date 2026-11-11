@@ -50,9 +50,11 @@ GEMINI_MODEL=gemini-3.6-flash
 ```
 
 Keep `.env` local—never commit it or share the Gemini API key. For production,
-also set a unique `DJANGO_SECRET_KEY`, set `DJANGO_DEBUG=False`, and configure
-`DJANGO_ALLOWED_HOSTS` for your deployment. Development generates a temporary
-Django secret automatically if `DJANGO_SECRET_KEY` is not set.
+set a unique `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=False`, and `DJANGO_ALLOWED_HOSTS`
+for your deployment. HTTPS redirect, secure cookies, and HSTS are enabled by
+default when debug is disabled; configure `DJANGO_SECURE_*` only to match your
+trusted HTTPS proxy. Development generates a temporary Django secret if
+`DJANGO_SECRET_KEY` is unset.
 
 ### Start the Django application
 
@@ -68,7 +70,7 @@ python manage.py runserver
 
 Open the Django application at <http://127.0.0.1:8000/>.
 
-The home page redirects to login. Create an account at `/signup/`, then use the authenticated dashboard. The API health check is available at <http://127.0.0.1:8000/api/history/>.
+The home page redirects to login. Create an account at `/signup/`, then use the authenticated dashboard. API history is private to the signed-in user; anonymous requests receive an empty history.
 
 ### Optional legacy Streamlit interface
 
@@ -92,6 +94,7 @@ For the new Django interface, only the Django server is required. The Streamlit 
 - If the key is exposed, revoke it in Google AI Studio and create a new one.
 - The `.env` file is ignored by Git and should remain local.
 - The Django application runs on its own; only the optional legacy Streamlit interface needs a separate process.
+- Learning history, flashcards, and saved plans are scoped to signed-in accounts. AI/OCR endpoints are rate-limited per client.
 
 ## Common Problems
 
@@ -106,7 +109,7 @@ conda activate studyai
 
 **Django shows a 404 at `/`**
 
-The current project includes a Django homepage. Restart the server and open `http://127.0.0.1:8000/`. The API health check is at `/api/history/`.
+The current project includes a Django homepage. Restart the server and open `http://127.0.0.1:8000/`.
 
 **The legacy Streamlit frontend says “Backend error”**
 

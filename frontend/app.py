@@ -26,6 +26,21 @@ def get_api_base() -> str:
 
 
 API_BASE = get_api_base() or "http://127.0.0.1:8000/api"
+API_ROOT = API_BASE.rsplit("/api", 1)[0].rstrip("/")
+
+
+def get_backend_session():
+    """Keep a CSRF-enabled anonymous session for the optional Streamlit client."""
+    session = st.session_state.get("studyai_backend_session")
+    if session is None:
+        session = requests.Session()
+        response = session.get(f"{API_ROOT}/login/", timeout=10)
+        response.raise_for_status()
+        st.session_state["studyai_backend_session"] = session
+    csrf_token = session.cookies.get("csrftoken")
+    if not csrf_token:
+        raise RuntimeError("The Django backend did not provide a CSRF token.")
+    return session, csrf_token
 
 
 # Page setup
@@ -133,7 +148,14 @@ div[data-testid="stButton"] > button:active { transform: translateY(0px) !import
 def api_post(endpoint, data=None, files=None):
     """Send POST request to Django API."""
     try:
-        r = requests.post(f"{API_BASE}/{endpoint}/", json=data, files=files, timeout=30)
+        session, csrf_token = get_backend_session()
+        r = session.post(
+            f"{API_BASE}/{endpoint}/",
+            json=data,
+            files=files,
+            headers={"X-CSRFToken": csrf_token},
+            timeout=30,
+        )
         payload = r.json()
         if not r.ok:
             return {"error": payload.get("error", f"Request failed ({r.status_code}).")}
@@ -147,7 +169,8 @@ def api_post(endpoint, data=None, files=None):
 def api_get(endpoint):
     """Send GET request to Django API."""
     try:
-        response = requests.get(f"{API_BASE}/{endpoint}/", timeout=10)
+        session, _ = get_backend_session()
+        response = session.get(f"{API_BASE}/{endpoint}/", timeout=10)
         payload = response.json()
         if not response.ok:
             return {"error": payload.get("error", f"Request failed ({response.status_code}).")}
@@ -161,7 +184,12 @@ def api_get(endpoint):
 def api_delete(endpoint):
     """Send DELETE request to Django API."""
     try:
-        response = requests.delete(f"{API_BASE}/{endpoint}/", timeout=10)
+        session, csrf_token = get_backend_session()
+        response = session.delete(
+            f"{API_BASE}/{endpoint}/",
+            headers={"X-CSRFToken": csrf_token},
+            timeout=10,
+        )
         payload = response.json()
         if not response.ok:
             return {"error": payload.get("error", f"Request failed ({response.status_code}).")}

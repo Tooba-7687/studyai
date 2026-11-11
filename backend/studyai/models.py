@@ -12,6 +12,7 @@ class ProblemHistory(models.Model):
         ('General', 'General'),
     ]
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='problem_history', null=True, blank=True)
     problem    = models.TextField()
     solution   = models.TextField()
     subject    = models.CharField(max_length=20, choices=SUBJECT_CHOICES, default='General')
@@ -26,6 +27,7 @@ class ProblemHistory(models.Model):
 
 class Flashcard(models.Model):
 
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='flashcards', null=True, blank=True)
     topic      = models.CharField(max_length=200, default='General')
     question   = models.TextField()
     answer     = models.TextField()

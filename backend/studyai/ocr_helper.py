@@ -1,9 +1,11 @@
-import io
+import logging
 
 from google import genai
 from django.conf import settings
 
 from .ai_helper import GENERATION_MODEL, get_client
+
+logger = logging.getLogger(__name__)
 
 
 def extract_text(image_file) -> dict:
@@ -51,10 +53,11 @@ def extract_text(image_file) -> dict:
                 "message": "No text found in image. Try a clearer photo.",
             }
 
-    except Exception as e:
+    except Exception:
+        logger.exception("Image text extraction failed")
         return {
             "success": False,
             "text": "",
             "char_count": 0,
-            "message": f"OCR failed: {str(e)}",
+            "message": "Image text extraction failed. Please try another image.",
         }

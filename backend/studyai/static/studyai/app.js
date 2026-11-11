@@ -1,5 +1,10 @@
 const api = async (endpoint, options = {}) => {
-    const response = await fetch(`/api/${endpoint}/`, {headers: {'X-Requested-With': 'XMLHttpRequest', ...(options.headers || {})}, ...options});
+    const method = (options.method || 'GET').toUpperCase();
+    const headers = {'X-Requested-With': 'XMLHttpRequest', ...(options.headers || {})};
+    if (!['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method)) {
+        headers['X-CSRFToken'] = document.querySelector('[name="csrfmiddlewaretoken"]')?.value || '';
+    }
+    const response = await fetch(`/api/${endpoint}/`, {...options, headers});
     const contentType = response.headers.get('content-type') || '';
     const data = contentType.includes('application/json') ? await response.json() : null;
     if (!data) throw new Error(`Server returned an unexpected response (${response.status}). Refresh the page and try again.`);

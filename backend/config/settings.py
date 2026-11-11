@@ -23,6 +23,22 @@ ALLOWED_HOSTS = [host.strip() for host in os.getenv(
     'DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,testserver'
 ).split(',') if host.strip()]
 
+# Secure browser cookies and HTTPS defaults when running with DEBUG disabled.
+# Deployments behind a TLS-terminating proxy must configure Django's trusted
+# proxy HTTPS signal in their hosting environment to avoid redirect loops.
+SECURE_SSL_REDIRECT = os.getenv(
+    'DJANGO_SECURE_SSL_REDIRECT', str(not DEBUG)
+).lower() in ('1', 'true', 'yes')
+SESSION_COOKIE_SECURE = os.getenv(
+    'DJANGO_SESSION_COOKIE_SECURE', str(not DEBUG)
+).lower() in ('1', 'true', 'yes')
+CSRF_COOKIE_SECURE = os.getenv(
+    'DJANGO_CSRF_COOKIE_SECURE', str(not DEBUG)
+).lower() in ('1', 'true', 'yes')
+SECURE_HSTS_SECONDS = int(os.getenv(
+    'DJANGO_SECURE_HSTS_SECONDS', '31536000' if not DEBUG else '0'
+))
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
