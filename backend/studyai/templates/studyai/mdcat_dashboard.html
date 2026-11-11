@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MDCAT Desk | StudyAI</title>
+    <link rel="stylesheet" href="{% static 'studyai/app.css' %}">
+    <link rel="stylesheet" href="{% static 'studyai/mdcat.css' %}">
+    <link rel="stylesheet" href="{% static 'studyai/mdcat-polish.css' %}?v=20260914-2">
+</head>
+<body>
+    <div class="mdcat-shell">
+        <header class="mdcat-topbar">
+            <a class="brand" href="{% url 'dashboard' %}"><span>✦</span> StudyAI</a>
+            <div class="mdcat-user"><span>MDCAT PREP DESK</span><strong>{{ request.user.username }}</strong><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Log out</button></form></div>
+        </header>
+        <main class="mdcat-content">
+            {% if messages %}<div class="mdcat-notices">{% for message in messages %}<div class="mdcat-notice">{{ message }}</div>{% endfor %}</div>{% endif %}
+            <section class="mdcat-welcome"><div><span class="eyebrow">YOUR MEDICAL ENTRY PREP</span><h1>Build your MDCAT confidence.</h1><p>A focused home for concepts, practice, revision, and exam-day readiness.</p></div><div class="mdcat-mark">MDCAT<span>+</span></div></section>
+            <section class="mdcat-grid stats-grid"><div class="mdcat-stat"><span>SUBJECTS</span><strong>04</strong><small>Core preparation areas</small></div><div class="mdcat-stat"><span>DAILY FOCUS</span><strong>01</strong><small>Clear next session</small></div><div class="mdcat-stat highlight"><span>EXAM COUNTDOWN</span><strong id="mdcat-days">Set date</strong><small>Choose your target date below</small></div></section>
+            <section class="mdcat-section"><div class="section-title"><span class="eyebrow">YOUR CORE SUBJECTS</span><h2>Choose what to work on today.</h2></div><div class="subject-grid"><article><b>Biology</b><span>Concepts, diagrams, terminology</span><button data-subject="Biology">Practice Biology →</button></article><article><b>Chemistry</b><span>Reactions, equations, numericals</span><button data-subject="Chemistry">Practice Chemistry →</button></article><article><b>Physics</b><span>Formulas, logic, problem solving</span><button data-subject="Physics">Practice Physics →</button></article><article><b>English</b><span>Vocabulary, grammar, comprehension</span><button data-subject="English">Practice English →</button></article></div><div id="mdcat-practice" class="mdcat-practice"></div></section>
+            <section class="mdcat-resource topic-coach-entry"><div><span class="eyebrow">AI STUDY COACH</span><h2>Learn with a topic coach or tutor chat.</h2><p>Get clear explanations, answer-backed MCQs, hints, and revision help.</p></div><div class="topic-coach-actions"><a class="primary-button" href="{% url 'mdcat_tools' %}?tab=topic-coach">Open Topic Coach →</a><a class="secondary-button" href="{% url 'mdcat_tools' %}?tab=tutor-chat">Ask Tutor →</a></div></section>
+            <section class="mdcat-lower"><article class="mdcat-panel"><span class="eyebrow">PREPARATION ROADMAP</span><h2>Four habits that move your score.</h2><ol><li><strong>Learn</strong><span>Understand the concept before memorizing it.</span></li><li><strong>Practice</strong><span>Use timed questions for every subject.</span></li><li><strong>Review</strong><span>Keep a record of wrong answers and weak topics.</span></li><li><strong>Repeat</strong><span>Return to difficult topics with spaced revision.</span></li></ol></article><article class="mdcat-panel"><span class="eyebrow">TARGET DATE</span><h2>Set your preparation finish line.</h2><form method="post" class="target-form">{% csrf_token %}<label for="target-date">Exam or target date</label><input id="target-date" name="target_date" type="date" value="{{ profile.target_date|date:'Y-m-d' }}" required><button type="submit">Save target date</button></form><p class="resource-note">Official syllabus and institute resources will be added only from verified public sources.</p></article></section>
+            <section class="mdcat-resource"><div><span class="eyebrow">OFFICIAL RESOURCES</span><h2>Keep your preparation source-grounded.</h2><p>Use verified syllabus notices, past papers, and official institute channels. Resource links can be added here after they are reviewed.</p></div><span class="resource-badge">VERIFIED ONLY</span></section>
+        </main>
+    </div>
+    <script src="{% static 'studyai/mdcat.js' %}?v=20260913-4"></script>
+</body>
+</html>

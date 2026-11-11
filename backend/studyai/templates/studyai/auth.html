@@ -1,0 +1,49 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title|default:"StudyAI" }}</title>
+    <link rel="stylesheet" href="{% static 'studyai/app.css' %}">
+    <link rel="stylesheet" href="{% static 'studyai/mdcat-polish.css' %}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <div class="auth-brand"><span>✦</span> StudyAI</div>
+        <section class="auth-card">
+            <div class="eyebrow">AI STUDY COMPANION</div>
+            <h1>{{ heading }}</h1>
+            <p class="auth-intro">Learn clearly. Practice consistently. Prepare with confidence.</p>
+            {% if messages %}
+                {% for message in messages %}<div class="notice success">{{ message }}</div>{% endfor %}
+            {% endif %}
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+                {% if not is_signup %}
+                    <label for="dashboard-choice">Open dashboard</label>
+                    <select id="dashboard-choice" name="dashboard">
+                        <option value="general"{% if selected_dashboard == 'general' %} selected{% endif %}>General Study Dashboard</option>
+                        <option value="mdcat"{% if selected_dashboard == 'mdcat' %} selected{% endif %}>MDCAT Dashboard</option>
+                    </select>
+                {% endif %}
+                {% for field in form %}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+                    {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                {% endfor %}
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                {% endif %}
+                <button class="primary-button" type="submit">{{ action }}</button>
+            </form>
+            {% if is_signup %}
+                <p class="auth-switch">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+            {% else %}
+                <p class="auth-switch">New to StudyAI? <a href="{% url 'signup' %}">Create an account</a></p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

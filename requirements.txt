@@ -1,0 +1,11 @@
+# ── Backend ────────────────────────────────────────────────
+Django==6.1
+djangorestframework==3.18.0
+django-cors-headers==4.9.0
+python-dotenv==1.2.3
+google-genai==2.18.1
+Pillow==12.2.0
+
+# ── Frontend ───────────────────────────────────────────────
+streamlit==1.57.0
+requests==2.34.0

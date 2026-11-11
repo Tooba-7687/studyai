@@ -1,0 +1,86 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StudyAI Dashboard</title>
+    <link rel="stylesheet" href="{% static 'studyai/app.css' %}">
+    <link rel="stylesheet" href="{% static 'studyai/markdown.css' %}">
+    <link rel="stylesheet" href="{% static 'studyai/quiz.css' %}">
+    <link rel="stylesheet" href="{% static 'studyai/plans.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <a class="brand" href="{% url 'dashboard' %}"><span>✦</span> StudyAI</a>
+            <p class="sidebar-copy">Your focused space for learning, practice, and exam preparation.</p>
+            <div id="backend-status" class="status-pill">Checking backend...</div>
+            <nav class="mode-nav" aria-label="Study tools">
+                <button class="mode-button active" data-mode="solve">Solve</button>
+                <button class="mode-button" data-mode="scan">Scan image</button>
+                <button class="mode-button" data-mode="flashcards">Flashcards</button>
+                <button class="mode-button" data-mode="quiz">Quiz</button>
+                <button class="mode-button" data-mode="planner">Study planner</button>
+                <button class="mode-button" data-mode="summarize">Summarizer</button>
+                <button class="mode-button" data-mode="formulas">Formula sheet</button>
+                <button class="mode-button" data-mode="explain">Explain simply</button>
+                <button class="mode-button" data-mode="history">History</button>
+            </nav>
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}<button class="text-button" type="submit">Log out</button>
+            </form>
+        </aside>
+
+        <main class="content">
+            <header class="topbar">
+                <div><span class="eyebrow">YOUR LEARNING DESK</span><h1>Good to see you, {{ request.user.username }}.</h1><p class="topbar-subtitle">Choose a small next step and keep your momentum moving.</p></div>
+                <span class="user-chip">✦ {{ request.user.username }}</span>
+            </header>
+
+            <section class="dashboard-hero">
+                <div class="hero-copy"><span class="eyebrow">A CALMER WAY TO STUDY</span><h2>Turn questions into progress.</h2><p>Get unstuck, practice what matters, and build a plan you can actually follow.</p></div>
+                <div class="hero-orbit"><span>AI</span><i>learn</i><b>grow</b></div>
+            </section>
+
+            <section class="stat-row" aria-label="Study overview">
+                <div class="stat-card"><span>PROGRESS</span><strong id="solved-count">—</strong><small>solved problems</small></div>
+                <div class="stat-card accent"><span>TOOLKIT</span><strong>09</strong><small>ways to learn</small></div>
+                <div class="stat-card warm"><span>YOUR RHYTHM</span><strong>1</strong><small>focused next step</small></div>
+            </section>
+
+            <section class="quick-start">
+                <div class="section-heading"><div><span class="eyebrow">QUICK START</span><h2>What do you need right now?</h2></div><span class="section-note">Pick a tool to begin</span></div>
+                <div class="quick-grid">
+                    <button class="quick-tool featured" data-mode="solve"><span class="quick-icon">✦</span><strong>Continue learning</strong><small>Get help with a problem</small><em>→</em></button>
+                    <button class="quick-tool" data-mode="planner"><span class="quick-icon">◷</span><strong>Plan your week</strong><small>Organize your exam prep</small><em>→</em></button>
+                    <button class="quick-tool" data-mode="quiz"><span class="quick-icon">?</span><strong>Test your knowledge</strong><small>Practice what you learned</small><em>→</em></button>
+                    <button class="quick-tool" data-mode="flashcards"><span class="quick-icon">▣</span><strong>Review your notes</strong><small>Build quick revision cards</small><em>→</em></button>
+                </div>
+            </section>
+
+            <section class="tool-panel active" data-panel="solve">
+                <div class="panel-heading"><span class="eyebrow">SOLVE</span><h2>Understand any problem step by step.</h2><p>Ask a question and get a clear explanation with the key concept highlighted.</p></div>
+                <textarea id="solve-input" placeholder="Try: Explain photosynthesis step by step, or solve 2x² + 5x - 3 = 0"></textarea>
+                <button class="primary-button" data-action="solve">Get AI solution</button>
+                <div class="result" id="solve-result"></div>
+            </section>
+
+            <section class="tool-panel" data-panel="scan"><div class="panel-heading"><span class="eyebrow">SCAN IMAGE</span><h2>Turn a photo into editable text.</h2><p>Upload a clear JPG, PNG, or WebP image of a question.</p></div><input id="scan-input" type="file" accept="image/*"><button class="primary-button" data-action="scan">Extract text</button><div class="result" id="scan-result"></div></section>
+            <section class="tool-panel" data-panel="flashcards"><div class="panel-heading"><span class="eyebrow">FLASHCARDS</span><h2>Convert notes into revision cards.</h2></div><input id="flash-topic" placeholder="Topic"><textarea id="flash-input" placeholder="Paste your notes here..."></textarea><button class="primary-button" data-action="flashcards">Generate flashcards</button><div class="result" id="flashcards-result"></div></section>
+            <section class="tool-panel" data-panel="quiz"><div class="panel-heading"><span class="eyebrow">QUIZ WORKSPACE</span><h2>Practice in the way that suits you.</h2><p>Choose MCQs, written answers, or question-and-answer practice.</p></div><label class="field-label" for="quiz-type">Test type</label><select id="quiz-type"><option value="mcq">MCQ test</option><option value="written">Written-answer test</option><option value="qa">Q&amp;A practice</option></select><input id="quiz-input" placeholder="Topic, e.g. Object-oriented programming, 10 questions"><label class="field-label" for="quiz-count">Number of questions</label><input id="quiz-count" type="number" min="1" max="20" placeholder="Default: 5"><button class="primary-button" data-action="quiz">Start test</button><div class="result" id="quiz-result"></div></section>
+            <section class="tool-panel" data-panel="planner"><div class="panel-heading"><span class="eyebrow">STUDY PLANNER</span><h2>Build a realistic study roadmap.</h2><p>Choose the final study or exam date. Your plan will run from today until that date.</p></div><textarea id="plan-topics" placeholder="Topics to study..."></textarea><div class="form-grid"><label>Final study / exam date<input id="plan-date" type="date"></label><label>Hours per day<select id="plan-hours"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label></div><button class="primary-button" data-action="planner">Generate study plan</button><div class="result" id="planner-result"></div><div class="saved-plans-heading"><span class="eyebrow">MY SAVED PLANS</span><button class="secondary-button" data-action="refresh-plans">Refresh</button></div><div id="saved-plans" class="saved-plans"></div></section>
+            <section class="tool-panel" data-panel="summarize"><div class="panel-heading"><span class="eyebrow">SUMMARIZER</span><h2>Find the signal in your notes.</h2></div><textarea id="summary-input" placeholder="Paste notes, an article, or a textbook section..."></textarea><select id="summary-length"><option>short</option><option selected>medium</option><option>long</option></select><button class="primary-button" data-action="summarize">Summarize</button><div class="result" id="summarize-result"></div></section>
+            <section class="tool-panel" data-panel="formulas"><div class="panel-heading"><span class="eyebrow">FORMULA SHEET</span><h2>Keep the rules you need close.</h2></div><textarea id="formula-input" placeholder="Paste your notes..."></textarea><button class="primary-button" data-action="formulas">Extract formulas</button><div class="result" id="formulas-result"></div></section>
+            <section class="tool-panel" data-panel="explain"><div class="panel-heading"><span class="eyebrow">EXPLAIN SIMPLY</span><h2>Make complex ideas feel approachable.</h2></div><input id="explain-input" placeholder="What should we explain?"><select id="explain-audience"><option value="child">10-year-old</option><option value="teen">Teenager</option><option value="simple">Non-technical adult</option></select><button class="primary-button" data-action="explain">Explain</button><div class="result" id="explain-result"></div></section>
+            <section class="tool-panel" data-panel="history"><div class="panel-heading"><span class="eyebrow">HISTORY</span><h2>Review your learning trail.</h2></div><button class="secondary-button" data-action="history">Refresh history</button><div class="result" id="history-result"></div></section>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
+    <script src="{% static 'studyai/app.js' %}?v=20260913-5"></script>
+</body>
+</html>
